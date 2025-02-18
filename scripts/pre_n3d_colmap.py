@@ -74,6 +74,7 @@ def preparecolmapdynerf(folder, offset=0):
         os.mkdir(savedir)
     for folder in folderlist :
         imagepath = os.path.join(folder, str(offset) + ".png")
+        folder.replace("\\", "/")
         imagesavepath = os.path.join(savedir, folder.split("/")[-2] + ".png")
 
         shutil.copy(imagepath, imagesavepath)
@@ -186,7 +187,7 @@ if __name__ == "__main__" :
     if not videopath.endswith("/"):
         videopath = videopath + "/"
     
-    # # ## step1
+    # ## step1
     # print("start extracting 300 frames from videos")
     # videoslist = glob.glob(videopath + "*.mp4")
     # for v in tqdm.tqdm(videoslist):
