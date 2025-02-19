@@ -1094,7 +1094,7 @@ class CGaussianModel:
 
         torch.cuda.empty_cache()
         
-    def add_densification_stats(self, viewspace_point_tensor, static_update_filter, dynamic_update_filter, static_num):
+    def add_densification_stats(self, viewspace_point_tensor, static_update_filter, dynamic_update_filter, static_num, opacity):
         xyz_grad = torch.norm(viewspace_point_tensor.grad[:static_num][static_update_filter,:2], dim=-1, keepdim=True)
         self.xyz_gradient_accum[static_update_filter] += xyz_grad
         self.denom[static_update_filter] += 1
@@ -1102,7 +1102,12 @@ class CGaussianModel:
         if self.motion_xyz_gradient_accum.shape[0] == 0:
             return
         
-        if self.densification_model == "v1":
+        import pdb; pdb.set_trace()
+        
+        if self.densification_model == "v2":
+            temporal_scale = (self._opacity_duration_center[dynamic_update_filter, 1] - self._opacity_duration_center[dynamic_update_filter, 0]).abs()
+            weight = opacity[static_num:][dynamic_update_filter, 0:1] * (1 / (temporal_scale**2 + 1e-4))
+        elif self.densification_model == "v1":
             weight = 10
         else:
             weight = 1

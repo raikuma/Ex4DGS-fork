@@ -120,5 +120,6 @@ def render(viewpoint_camera, pc, pipe, bg_color : torch.Tensor, timestamp=None, 
             "viewspace_l1points": flow,
             "dominent_idxs": idxs,
             "visibility_filter" : radii > 0,
-            "radii": radii
+            "radii": radii,
+            "opacity": opacity,
             }
