@@ -275,7 +275,7 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
                         e_count = 0
 
             # create dynamic points from static points
-            if mark_extract or iteration % 10 == 0:
+            if mark_extract:
                 static_num = gaussians._xyz.shape[0]
                 static_vis_filter = visibility_filter[:static_num]
                 gaussians.extract_dynamic_points_from_static(torch.tensor(viewpoint_cam.T).unsqueeze(0), viewpoint_cam.timestamp, 
