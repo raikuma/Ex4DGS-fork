@@ -1102,8 +1102,6 @@ class CGaussianModel:
         if self.motion_xyz_gradient_accum.shape[0] == 0:
             return
         
-        import pdb; pdb.set_trace()
-        
         if self.densification_model == "v2":
             temporal_scale = (self._opacity_duration_center[dynamic_update_filter, 1] - self._opacity_duration_center[dynamic_update_filter, 0]).abs()
             weight = opacity[static_num:][dynamic_update_filter, 0:1] * (1 / (temporal_scale**2 + 1e-4))
