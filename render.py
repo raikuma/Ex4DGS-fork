@@ -19,7 +19,6 @@ import torchvision
 from tqdm import tqdm
 from skimage.metrics import structural_similarity as sk_ssim
 from lpipsPyTorch import lpips
-import joblib
 
 from scene import Scene
 from gaussian_renderer import render
@@ -31,8 +30,10 @@ from arguments import ModelParams, PipelineParams, OptimizationParams, get_combi
 from scene.c_gaussian_model import CGaussianModel as GaussianModel
 from utils.loss_utils import ssim
 
+from tqdm import tqdm
 
-def render_set(model_path, name, iteration, scene, gaussians, pipeline, background, inverval=1, near=0.2, far=100.0, save_img=False):
+
+def render_set(model_path, name, iteration, scene, gaussians, pipeline, background, inverval=1, near=0.2, far=100.0, save_img=False, skip_timing=False):
     gts_path = os.path.join(model_path, name, "itrs_{}".format(iteration), "gt")
     render_path = os.path.join(model_path, name, "itrs_{}".format(iteration), "renders")
 
@@ -65,6 +66,7 @@ def render_set(model_path, name, iteration, scene, gaussians, pipeline, backgrou
         cam = viewpoint_stack.pop(0)
         gt = next(images).cuda()
 
+        print("Rendering ", cam.image_name)
         if idx % inverval == 0:
             rendering_dict = render(cam, gaussians, pipeline, background, near=near, far=far)
             rendering = rendering_dict["render"]
@@ -88,12 +90,15 @@ def render_set(model_path, name, iteration, scene, gaussians, pipeline, backgrou
         idx += 1
         
     # start timing
-    for _ in range(20):
-        for idx in range(500):
-            st = time.time()
-            rendering_dict = render(cam, gaussians, pipeline, background, near=near, far=far)
-            if idx > 100: #warm up
-                times.append(time.time() - st)
+    if not skip_timing:
+        for _ in tqdm(range(20)):
+            for idx in range(500):
+                st = time.time()
+                rendering_dict = render(cam, gaussians, pipeline, background, near=near, far=far)
+                if idx > 100: #warm up
+                    times.append(time.time() - st)
+    else:
+        times = [0]
         
     mean_results = {
         "SSIM": torch.tensor(ssims).mean().item(),
@@ -123,7 +128,7 @@ def render_set(model_path, name, iteration, scene, gaussians, pipeline, backgrou
     print("Set " + name + ", PSNR: ", psnr_sum / count, ", Count: ", count)
     
 
-def render_sets(dataset : ModelParams, iteration : int, opt : OptimizationParams, pipeline : PipelineParams, skip_train : bool, train_inverval : int, skip_test : bool, save_img : bool):
+def render_sets(dataset : ModelParams, iteration : int, opt : OptimizationParams, pipeline : PipelineParams, skip_train : bool, train_inverval : int, skip_test : bool, save_img : bool, skip_timing : bool):
     with torch.no_grad():
         gaussians = GaussianModel(dataset.sh_degree, dataset.duration, dataset.time_interval, dataset.time_pad, interp_type=dataset.interp_type, time_pad_type=dataset.time_pad_type)
         scene = Scene(dataset, gaussians, load_iteration=iteration, shuffle=False, opt=opt)
@@ -132,10 +137,10 @@ def render_sets(dataset : ModelParams, iteration : int, opt : OptimizationParams
         background = torch.tensor(bg_color, dtype=torch.float32, device="cuda")
 
         if not skip_train:
-             render_set(dataset.model_path, "train", scene.loaded_iter, scene, gaussians, pipeline, background, train_inverval, near=dataset.near, far=dataset.far, save_img=save_img)
+             render_set(dataset.model_path, "train", scene.loaded_iter, scene, gaussians, pipeline, background, train_inverval, near=dataset.near, far=dataset.far, save_img=save_img, skip_timing=skip_timing)
 
         if not skip_test:
-             render_set(dataset.model_path, "test", scene.loaded_iter, scene, gaussians, pipeline, background, near=dataset.near, far=dataset.far, save_img=save_img)
+             render_set(dataset.model_path, "test", scene.loaded_iter, scene, gaussians, pipeline, background, near=dataset.near, far=dataset.far, save_img=save_img, skip_timing=skip_timing)
 
 
 if __name__ == "__main__":
@@ -150,6 +155,7 @@ if __name__ == "__main__":
     parser.add_argument("--skip_test", action="store_true")
     parser.add_argument("--quiet", action="store_true")
     parser.add_argument("--save_img", action="store_true")
+    parser.add_argument("--skip_timing", action="store_true")
     args = get_combined_args(parser)
     print("Rendering " + args.model_path)
 
@@ -158,4 +164,4 @@ if __name__ == "__main__":
     # args.start_timestamp = 0
     # args.end_timestamp = 300
 
-    render_sets(model.extract(args), args.iteration, opt.extract(args), pipeline.extract(args), args.skip_train, args.train_inverval, args.skip_test, args.save_img)
+    render_sets(model.extract(args), args.iteration, opt.extract(args), pipeline.extract(args), args.skip_train, args.train_inverval, args.skip_test, args.save_img, args.skip_timing)
