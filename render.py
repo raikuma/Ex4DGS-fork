@@ -98,7 +98,7 @@ def render_set(model_path, name, iteration, scene, gaussians, pipeline, backgrou
                 if idx > 100: #warm up
                     times.append(time.time() - st)
     else:
-        times = [0]
+        times = [0.0]
         
     mean_results = {
         "SSIM": torch.tensor(ssims).mean().item(),
