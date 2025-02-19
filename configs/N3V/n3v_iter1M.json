@@ -33,5 +33,6 @@
   "interp_type": "cube",
   "loader": "neural3dvideo",
   "lazy_loader": true,
-  "random_background": true
+  "random_background": true,
+  "densification_model": "baseline"
 }

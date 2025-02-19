@@ -136,6 +136,7 @@ class OptimizationParams(ParamGroup):
         self.rot_reg = 0.00
         self.coord_reg = 0.00
         self.random_background = True
+        self.densification_model = "baseline"
         super().__init__(parser, "Optimization Parameters")
 
 def get_combined_args(parser : ArgumentParser):

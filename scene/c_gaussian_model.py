@@ -457,6 +457,8 @@ class CGaussianModel:
                                                     lr_final=training_args.dynamic_position_lr_final*self.spatial_lr_scale,
                                                     lr_delay_mult=training_args.dynamic_position_lr_delay_mult,
                                                     max_steps=training_args.dynamic_position_lr_max_steps)
+        
+        self.densification_model = training_args.densification_model
 
     def update_learning_rate(self, iteration):
         ''' Learning rate scheduling per step '''
@@ -1093,14 +1095,21 @@ class CGaussianModel:
         torch.cuda.empty_cache()
         
     def add_densification_stats(self, viewspace_point_tensor, static_update_filter, dynamic_update_filter, static_num):
-        self.xyz_gradient_accum[static_update_filter] += torch.norm(viewspace_point_tensor.grad[:static_num][static_update_filter,:2], dim=-1, keepdim=True)
+        xyz_grad = torch.norm(viewspace_point_tensor.grad[:static_num][static_update_filter,:2], dim=-1, keepdim=True)
+        self.xyz_gradient_accum[static_update_filter] += xyz_grad
         self.denom[static_update_filter] += 1
 
         if self.motion_xyz_gradient_accum.shape[0] == 0:
             return
         
-        self.motion_xyz_gradient_accum[dynamic_update_filter] += torch.norm(viewspace_point_tensor.grad[static_num:][dynamic_update_filter,:2], dim=-1, keepdim=True)
-        self.motion_denom[dynamic_update_filter] += 1
+        if self.densification_model == "v1":
+            weight = 10
+        else:
+            weight = 1
+
+        motion_xyz_grad = torch.norm(viewspace_point_tensor.grad[static_num:][dynamic_update_filter,:2], dim=-1, keepdim=True)
+        self.motion_xyz_gradient_accum[dynamic_update_filter] += motion_xyz_grad * weight
+        self.motion_denom[dynamic_update_filter] += 1 * weight
         
     def mark_prune_stats(self, radii, viewspace_point_error_tensor):
         static_num = self._xyz.shape[0]
