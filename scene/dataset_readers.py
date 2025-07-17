@@ -297,9 +297,10 @@ def readN3VCameras(cam_extrinsics, cam_intrinsics, images_folder, near, far, sta
         else:
             assert False, "Colmap camera model not handled: only undistorted datasets (PINHOLE or SIMPLE_PINHOLE cameras) supported!"
 
-        cam_img_dir = os.path.join(images_folder, extr.name[:-4])
+        # cam_img_dir = os.path.join(images_folder, extr.name[:-4])
         # tot_image_paths = sorted(glob.glob(cam_img_dir + "/*.png"), key=lambda x: int(os.path.basename(x)[:-4]))
-        tot_image_paths = sorted(glob.glob(f"images/{cam_img_dir}_*.png"), key=lambda x: int(os.path.basename(x)[-8:-4]))
+        cam_name = extr.name[:-4]
+        tot_image_paths = sorted(glob.glob(f"images/{cam_name}_*.png"), key=lambda x: int(os.path.basename(x)[-8:-4]))
         
         for j, image_path in enumerate(tot_image_paths):
             
