@@ -1,1 +1,1 @@
-python train.py --config configs/n3v_iter120k.json --model_path output/N3DV_120K/${1}  --source_path data/N3DV/${1}
+python train.py --config configs/N3V/n3v_iter120k.json --model_path output/N3DV_120K/${1}  --source_path data/N3DV/${1}
