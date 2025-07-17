@@ -298,7 +298,8 @@ def readN3VCameras(cam_extrinsics, cam_intrinsics, images_folder, near, far, sta
             assert False, "Colmap camera model not handled: only undistorted datasets (PINHOLE or SIMPLE_PINHOLE cameras) supported!"
 
         cam_img_dir = os.path.join(images_folder, extr.name[:-4])
-        tot_image_paths = sorted(glob.glob(cam_img_dir + "/*.png"), key=lambda x: int(os.path.basename(x)[:-4]))
+        # tot_image_paths = sorted(glob.glob(cam_img_dir + "/*.png"), key=lambda x: int(os.path.basename(x)[:-4]))
+        tot_image_paths = sorted(glob.glob(f"images/{cam_img_dir}_*.png"), key=lambda x: int(os.path.basename(x)[-8:-4]))
         
         for j, image_path in enumerate(tot_image_paths):
             
@@ -519,14 +520,15 @@ def readColmapSceneInfoTechnicolor(path, images, eval, args):
 
 def readColmapSceneInfoNeural3DVideo(path, images, eval, args):
     colmap_path = os.path.join(path, "colmap_" + str(int(args.start_timestamp)))
+    sparse_path = os.path.join(colmap_path, "dense", "workspace", "sparse")
     try:
-        cameras_extrinsic_file = os.path.join(colmap_path, "sparse", "0", "images.bin")
-        cameras_intrinsic_file = os.path.join(colmap_path, "sparse", "0", "cameras.bin")
+        cameras_extrinsic_file = os.path.join(sparse_path, "images.bin")
+        cameras_intrinsic_file = os.path.join(sparse_path, "cameras.bin")
         cam_extrinsics = read_extrinsics_binary(cameras_extrinsic_file)
         cam_intrinsics = read_intrinsics_binary(cameras_intrinsic_file)
     except:
-        cameras_extrinsic_file = os.path.join(colmap_path, "sparse", "0", "images.txt")
-        cameras_intrinsic_file = os.path.join(colmap_path, "sparse", "0", "cameras.txt")
+        cameras_extrinsic_file = os.path.join(sparse_path, "images.txt")
+        cameras_intrinsic_file = os.path.join(sparse_path, "cameras.txt")
         cam_extrinsics = read_extrinsics_text(cameras_extrinsic_file)
         cam_intrinsics = read_intrinsics_text(cameras_intrinsic_file)
     
@@ -555,9 +557,9 @@ def readColmapSceneInfoNeural3DVideo(path, images, eval, args):
 
     nerf_normalization = getNerfppNorm(train_cam_infos)
 
-    ply_path = os.path.join(colmap_path, "sparse", "0", "points3D.ply")
-    bin_path = os.path.join(colmap_path, "sparse", "0", "points3D.bin")
-    txt_path = os.path.join(colmap_path, "sparse", "0", "points3D.txt")
+    ply_path = os.path.join(sparse_path, "points3D.ply")
+    bin_path = os.path.join(sparse_path, "points3D.bin")
+    txt_path = os.path.join(sparse_path, "points3D.txt")
     
     if not os.path.exists(ply_path):
         print("Converting point3d.bin to .ply, will happen only the first time you open the scene.")
