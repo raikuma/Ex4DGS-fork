@@ -519,7 +519,7 @@ def readColmapSceneInfoTechnicolor(path, images, eval, args):
 
 
 def readColmapSceneInfoNeural3DVideo(path, images, eval, args):
-    colmap_path = os.path.join(path, "colmap_" + str(int(args.start_timestamp)))
+    colmap_path = os.path.join(path, "colmap")
     sparse_path = os.path.join(colmap_path, "dense", "workspace", "sparse")
     try:
         cameras_extrinsic_file = os.path.join(sparse_path, "images.bin")
