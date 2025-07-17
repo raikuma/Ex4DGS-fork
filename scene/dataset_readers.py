@@ -300,7 +300,7 @@ def readN3VCameras(cam_extrinsics, cam_intrinsics, images_folder, near, far, sta
         # cam_img_dir = os.path.join(images_folder, extr.name[:-4])
         # tot_image_paths = sorted(glob.glob(cam_img_dir + "/*.png"), key=lambda x: int(os.path.basename(x)[:-4]))
         cam_name = extr.name[:-4]
-        tot_image_paths = sorted(glob.glob(os.path.join(images_folder, f"{cam_name}_*.png")), key=lambda x: int(os.path.basename(x)[-8:-4]))
+        tot_image_paths = sorted(glob.glob(os.path.join(images_folder, 'images', f"{cam_name}_*.png")), key=lambda x: int(os.path.basename(x)[-8:-4]))
         
         for j, image_path in enumerate(tot_image_paths):
             
