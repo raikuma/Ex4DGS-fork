@@ -562,7 +562,7 @@ def readColmapSceneInfoNeural3DVideo(path, images, eval, args):
     txt_path = os.path.join(colmap_path, "sparse", "0", "points3D.txt")
 
     # override ply_path
-    ply_path = os.path.join(path, "points3d.ply")
+    # ply_path = os.path.join(path, "points3d.ply")
 
     if not os.path.exists(ply_path):
         print("Converting point3d.bin to .ply, will happen only the first time you open the scene.")
