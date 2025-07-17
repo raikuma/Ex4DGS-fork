@@ -17,7 +17,7 @@
   "far": 300.0,
   "densification_interval": 300,
   "densify_from_iter": 500,
-  "densify_until_iter": 100000,
+  "densify_until_iter": 90000,
   "dynamic_position_lr_init": 0.00016,
   "opacity_motion_lr": 0.01,
   "opacity_motion_center_lr": 0.01,
