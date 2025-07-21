@@ -104,6 +104,7 @@ def render_set(model_path, name, iteration, scene, gaussians, pipeline, backgrou
     with open(os.path.join(model_path, "fps.txt"), 'w') as f:
         f.write(f"FPS: {fps:.5f}\n")
         print(f"FPS: {fps:.5f}")
+    exit(0)
 
     mean_results = {
         "SSIM": torch.tensor(ssims).mean().item(),
