@@ -3,7 +3,7 @@
 echo "Running metrics for model: ${1}, mask: ${2}, iteration: ${3}"
 python render.py --model_path ${1} --skip_train --iteration ${3} --save_img
 python metrics.py -m ${1}
-python metrics_mask.py -m ${1} --mask_path ${2} --gt_path ${1}/test/ours_None/gt
+python metrics_mask.py -m ${1} --mask_path ${2} --gt_path ${1}/test/itrs_${3}/gt
 python metric_fps.py -m ${1}
 python metric_number.py ${1} ${3}
 python metric_storage.py ${1} ${3}
