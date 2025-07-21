@@ -71,7 +71,7 @@ def render_set(model_path, name, iteration, scene, gaussians, pipeline, backgrou
             rendering_dict = render(cam, gaussians, pipeline, background, near=near, far=far)
             rendering = rendering_dict["render"]
             
-            img_name = cam.image_name
+            img_name = cam.image_name[6:]
             
             if save_img:
                 torchvision.utils.save_image(gt, os.path.join(gts_path, img_name))
