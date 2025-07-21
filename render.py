@@ -74,13 +74,14 @@ def render_set(model_path, name, iteration, scene, gaussians, pipeline, backgrou
             img_name = cam.image_name
             
             if save_img:
+                torchvision.utils.save_image(gt, os.path.join(gts_path, img_name))
                 torchvision.utils.save_image(rendering, os.path.join(render_path, img_name))
-            psnrs.append(psnr(rendering.unsqueeze(0), gt.unsqueeze(0)))
-            ssims.append(ssim(rendering.unsqueeze(0), gt.unsqueeze(0))) 
-            skssims.append(sk_ssim(rendering.detach().cpu().numpy(), gt.detach().cpu().numpy(), data_range=1, multichannel=True, channel_axis=0)) 
-            skssims2.append(sk_ssim(rendering.detach().cpu().numpy(), gt.detach().cpu().numpy(), data_range=2, multichannel=True, channel_axis=0)) 
-            lpipss.append(lpips(rendering.unsqueeze(0), gt.unsqueeze(0), net_type='alex')) #
-            lpipssvggs.append(lpips(rendering.unsqueeze(0), gt.unsqueeze(0), net_type='vgg'))
+            # psnrs.append(psnr(rendering.unsqueeze(0), gt.unsqueeze(0)))
+            # ssims.append(ssim(rendering.unsqueeze(0), gt.unsqueeze(0))) 
+            # skssims.append(sk_ssim(rendering.detach().cpu().numpy(), gt.detach().cpu().numpy(), data_range=1, multichannel=True, channel_axis=0)) 
+            # skssims2.append(sk_ssim(rendering.detach().cpu().numpy(), gt.detach().cpu().numpy(), data_range=2, multichannel=True, channel_axis=0)) 
+            # lpipss.append(lpips(rendering.unsqueeze(0), gt.unsqueeze(0), net_type='alex')) #
+            # lpipssvggs.append(lpips(rendering.unsqueeze(0), gt.unsqueeze(0), net_type='vgg'))
             
             image_names.append(img_name)
 
@@ -88,7 +89,9 @@ def render_set(model_path, name, iteration, scene, gaussians, pipeline, backgrou
             count += 1
         
         idx += 1
-        
+    
+    exit(0)
+
     # start timing
     if not skip_timing:
         for _ in tqdm(range(20)):
